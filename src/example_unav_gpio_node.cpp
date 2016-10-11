@@ -11,27 +11,20 @@ ros::Publisher pub_gpio;
  */
 void chatterCallback(const orbus_interface::Peripheral::ConstPtr& msg)
 {
-//    orbus_interface::Peripheral msg_send;
+    orbus_interface::Peripheral msg_send;
 
-//    if(msg.get()->gpio.at(0) == 1)
-//    {
-//        ROS_INFO_STREAM("High!");
-//    }
-    int size = msg.get()->gpio.size();
-    ROS_INFO_STREAM("Size: " << size);
-//    for(unsigned i=0; i < msg.get()->gpio.size(); ++i)
-//    {
-//        ROS_INFO_STREAM("Data[" << i <<"]" << (int) msg.get()->gpio.at(i));
-//    }
-//    msg_send.gpio.resize(size);
-//    msg_send.gpio.assign(size, 0);
-//    msg_send.gpio.at(4) = msg.get()->gpio.at(0);
+    if(msg.get()->gpio.at(0) == 1)
+    {
+        ROS_INFO_STREAM("High GP0, Set High GP4!");
+    }
+    int size = msg->gpio.size();
 
-//    msg_send.header.stamp = ros::Time::now();
-//    pub_gpio.publish(msg_send);
-    pub_gpio.publish(msg);
+    msg_send.gpio.resize(size);
+    msg_send.gpio.assign(size, 0);
+    msg_send.gpio.at(4) = msg.get()->gpio.at(0);
 
-    //ros::spinOnce();
+    msg_send.header.stamp = ros::Time::now();
+    pub_gpio.publish(msg_send);
 }
 
 /**
@@ -43,8 +36,8 @@ int main(int argc, char **argv)
     // Init Node handle
     ros::NodeHandle n;
 
-    ros::Subscriber sub_gpio = n.subscribe("/unav/peripheral", 1000, chatterCallback);
-    pub_gpio = n.advertise<orbus_interface::Peripheral>("/unav/cmd_peripheral", 1000);
+    ros::Subscriber sub_gpio = n.subscribe("/unav/peripheral", 1, chatterCallback);
+    pub_gpio = n.advertise<orbus_interface::Peripheral>("/unav/cmd_peripheral", 1);
 
     ROS_INFO("------------ ROS GPIO CONTROLLER -----------");
 
